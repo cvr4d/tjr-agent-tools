@@ -9,7 +9,7 @@ echo.
 echo This will install:
 echo   - yt-dlp
 echo   - ffmpeg (downloaded automatically)
-echo   - Python packages (rapidfuzz, Pillow, faster-whisper)
+echo   - Python packages (rapidfuzz, Pillow, faster-whisper, customtkinter)
 echo   - Whisper model (small, ~500 MB)
 echo.
 echo Estimated time: 5-15 minutes (depends on internet)
@@ -153,14 +153,27 @@ echo [OK] Packages installed.
 echo.
 
 REM ==========================================
-REM 7) Pre-download Whisper model
+REM 7) Verify GUI dependencies
+REM ==========================================
+echo [INFO] Verifying GUI dependencies...
+venv\Scripts\python.exe -c "import customtkinter; print('customtkinter OK')"
+if %errorlevel% neq 0 (
+    echo [ERROR] customtkinter not installed properly.
+    pause
+    exit /b 1
+)
+echo [OK] GUI dependencies verified.
+echo.
+
+REM ==========================================
+REM 8) Pre-download Whisper model
 REM ==========================================
 echo [INFO] Pre-downloading Whisper model (small, ~500 MB)...
 echo       This may take 5-10 minutes depending on your internet.
 echo       Please be patient...
 echo.
 
-python -c "from faster_whisper import WhisperModel; print('Downloading model...'); WhisperModel('small', device='cpu', compute_type='int8'); print('Model ready!')"
+venv\Scripts\python.exe -c "from faster_whisper import WhisperModel; print('Downloading model...'); WhisperModel('small', device='cpu', compute_type='int8'); print('Model ready!')"
 
 if %errorlevel% neq 0 (
     echo.
@@ -172,7 +185,7 @@ if %errorlevel% neq 0 (
 echo.
 
 REM ==========================================
-REM 8) Setup subtitles folder
+REM 9) Setup subtitles folder
 REM ==========================================
 if "%TJR_SUBTITLES%"=="" (
     echo [INFO] TJR_SUBTITLES environment variable is not set.
@@ -200,7 +213,10 @@ echo ============================================
 echo   Setup complete!
 echo ============================================
 echo.
-echo All tools are ready:
+echo To launch the GUI:
+echo   Double-click run-gui.bat
+echo.
+echo Or use command-line tools:
 echo   run.bat context "your phrase"
 echo   run.bat fuzzy   "your frase"
 echo   run.bat sub     video.mp4 5
